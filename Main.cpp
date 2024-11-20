@@ -16,7 +16,10 @@ using namespace std;
 int main()
 {
     Stoat stoat1;
+    Squirrel squirrel1;
     // cout << colors.GREEN_BACKGROUND << "Hello World!";
     stoat1.hiThere();
+    squirrel1.hiThere();
+    return 0;
 }
 
