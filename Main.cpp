@@ -11,15 +11,24 @@
 
 using namespace std;
 
+struct
+{
+    // Bullfrog bullfrog1;
+    // Stoat stoat1;
+    // Wolf wolf1;
+    int test = 5;
+} mainDeck;
+
 
 // Functions
+void fairHandMechanic()
+{}
+
+
 int main()
 {
-    Stoat stoat1;
-    Squirrel squirrel1;
     // cout << colors.GREEN_BACKGROUND << "Hello World!";
-    stoat1.hiThere();
-    squirrel1.hiThere();
+    cout << mainDeck.test;
     return 0;
 }
 
