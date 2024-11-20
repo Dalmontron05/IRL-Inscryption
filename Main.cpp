@@ -12,16 +12,11 @@
 using namespace std;
 
 
-// Global Variables
-
-
-// Classes
-
-
-
 // Functions
 int main()
 {
-    cout << colors.GREEN_BACKGROUND << "Hello World!";
+    Stoat stoat1;
+    // cout << colors.GREEN_BACKGROUND << "Hello World!";
+    stoat1.hiThere();
 }
 
