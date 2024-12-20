@@ -9,7 +9,7 @@
 #include <ctime>    // For seeding rand()
 
 #include "main.h"
-// #include "Color-Codes.cpp"
+#include "Escape-Codes.cpp"
 #include "Creatures.cpp"
 
 using namespace std;
@@ -17,18 +17,21 @@ using namespace std;
 // TODO: eventually make it to where a deck isn't simplified to just "creatures," and that they are unique subclasses (since bell tentale and dire wolf are going to need their own implimentations for the attack and 1 turn grow up sigils respectively)
 
 // * Variables
+bool willReplay = true;
 vector<unique_ptr<Creature>> mainDeck;
 vector<unique_ptr<Creature>> sideDeck;
 // we have temporary decks to keep track of which cards have been drawn in a fight.
 vector<unique_ptr<Creature>> tempMainDeck;
 vector<unique_ptr<Creature>> tempsideDeck;
+// for now, current hand creatures are also considered on the board
 vector<unique_ptr<Creature>> currentHand;
 
 
 // * Functions
 int main() {
-    // Decks of creatures
-
+    // Clears previous input
+    cout << ANSI.CLEAR;
+    
     // Adding creatures to the deck (vanilla starting deck)
     mainDeck.push_back(make_unique<Bullfrog>());
     mainDeck.push_back(make_unique<Stoat>());
@@ -42,30 +45,45 @@ int main() {
         tempsideDeck.push_back(make_unique<Squirrel>());
     }
 
-    fightSetup();
+    while (willReplay == true)
+    {
+        // Gives user the list of options available in the application
+        cout << "What will you do (Enter integer)?" << endl;
+        cout << "1) Draw First Card 2) Draw Card" << endl;
+        cout << "3) Discard Card 4) Reset 5) Exit" << endl;
 
-    // TEST: Display stats of all creatures in the deck
-    cout << "main deck";
-    for (const auto& creature : mainDeck) {
-        creature->displayStats();
-    }
+        // Asks user for choice input
+        int userChoice;
+        cin >> userChoice;
+        cin.ignore(1000, '\n');
 
-    cout << endl;
-    cout << endl;
+        cout << ANSI.CLEAR;
 
-    // Display stats of all creatures in the temp deck
-    cout << "temp main deck";
-    for (const auto& creature : tempMainDeck) {
-        creature->displayStats();
-    }
+        // logic for choice
+        switch (userChoice)
+        {
+            case 1:
+                cout << "Starting fight sequence, drawing first 5 cards...";
+                fightSetup();
 
-    cout << endl;
-    cout << endl;
-
-    // current hand
-    cout << "current hand";
-    for (const auto& creature : currentHand) {
-    creature->displayStats();
+                break;
+            case 2:
+                // code
+                break;
+            case 3:
+                // code
+                break;
+            case 4:
+                // code
+                break;
+            case 5:
+                cout << "Exiting..." << endl;
+                willReplay = false;
+                break;
+            default:
+                cerr << "Invalid input detected. Exiting..." << endl;
+                willReplay = false;
+        }
     }
     
     return 0;
@@ -108,6 +126,33 @@ void fightSetup()
 
         // Remove it from tempMainDeck
         tempMainDeck.erase(tempMainDeck.begin() + randomIndex);
+    }
+}
+
+void test()
+{
+    // TEST: Display stats of all creatures in the deck
+    cout << "main deck";
+    for (const auto& creature : mainDeck) {
+        creature->displayStats();
+    }
+
+    cout << endl;
+    cout << endl;
+
+    // Display stats of all creatures in the temp deck
+    cout << "temp main deck";
+    for (const auto& creature : tempMainDeck) {
+        creature->displayStats();
+    }
+
+    cout << endl;
+    cout << endl;
+
+    // current hand
+    cout << "current hand";
+    for (const auto& creature : currentHand) {
+    creature->displayStats();
     }
 }
 

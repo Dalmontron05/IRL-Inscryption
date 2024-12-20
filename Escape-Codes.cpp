@@ -7,11 +7,14 @@
 using namespace std;
 
 // Functions
-class ColorCodes
+class EscapeCodes
 {
 public:
     // Reset
     string RESET = "\033[0m"; // Text Reset
+
+    // Clear
+    string CLEAR = "\033[H\033[2J"; // clears the terminal screen and moves the cursor to the first row, first column
 
     // Regular Colors
     string BLACK = "\033[0;30m";   // BLACK
@@ -84,4 +87,4 @@ public:
     string WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
 };
 
-ColorCodes colors;
+EscapeCodes ANSI;

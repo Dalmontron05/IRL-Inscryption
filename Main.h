@@ -9,3 +9,4 @@
 
 int main();
 void fightSetup();
+void test();
