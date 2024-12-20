@@ -1,6 +1,6 @@
 //* Main C++ file
 
-// Imports
+// * Imports
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,29 +8,90 @@
 #include <cstdlib>  // For rand()
 #include <ctime>    // For seeding rand()
 
-// #include "main.h"
+#include "main.h"
 // #include "Color-Codes.cpp"
 #include "Creatures.cpp"
 
 using namespace std;
 
-// Variables
+// TODO: eventually make it to where a deck isn't simplified to just "creatures," and that they are unique subclasses (since bell tentale and dire wolf are going to need their own implimentations for the attack and 1 turn grow up sigils respectively)
+
+// * Variables
 vector<unique_ptr<Creature>> mainDeck;
-// we have a temporary main deck to keep track of which cards have been drawn in a fight.
+vector<unique_ptr<Creature>> sideDeck;
+// we have temporary decks to keep track of which cards have been drawn in a fight.
 vector<unique_ptr<Creature>> tempMainDeck;
+vector<unique_ptr<Creature>> tempsideDeck;
 vector<unique_ptr<Creature>> currentHand;
 
 
-// Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
-void fairHandMechanic(vector<unique_ptr<Creature>>& mainDeck) {
-    // Copy mainDeck to tempMainDeck
-    for (const auto& creature : mainDeck) {
-        tempMainDeck.push_back(make_unique<Creature>(*creature)); // Create a deep copy
+// * Functions
+int main() {
+    // Decks of creatures
+
+    // Adding creatures to the deck (vanilla starting deck)
+    mainDeck.push_back(make_unique<Bullfrog>());
+    mainDeck.push_back(make_unique<Stoat>());
+    mainDeck.push_back(make_unique<Wolf>());
+    mainDeck.push_back(make_unique<Wolf>());
+
+    // Add 10 Squirrels to the side deck
+    for (int i = 0; i < 10; i++)
+    {
+        sideDeck.push_back(make_unique<Squirrel>());
+        tempsideDeck.push_back(make_unique<Squirrel>());
     }
 
+    fightSetup();
+
+    // TEST: Display stats of all creatures in the deck
+    cout << "main deck";
+    for (const auto& creature : mainDeck) {
+        creature->displayStats();
+    }
+
+    cout << endl;
+    cout << endl;
+
+    // Display stats of all creatures in the temp deck
+    cout << "temp main deck";
+    for (const auto& creature : tempMainDeck) {
+        creature->displayStats();
+    }
+
+    cout << endl;
+    cout << endl;
+
+    // current hand
+    cout << "current hand";
+    for (const auto& creature : currentHand) {
+    creature->displayStats();
+    }
+    
+    return 0;
+}
+
+
+// Sets up initial prerequisites needed before a fight happens
+void fightSetup()
+{
+    // initalize temp decks as regular decks
+    // tempMainDeck = mainDeck;
+    // tempsideDeck = sideDeck;
+
+    for (const auto& creature : mainDeck) {
+        tempMainDeck.push_back(make_unique<Creature>(*creature));
+    }
+
+    for (const auto& creature : sideDeck) {
+        tempsideDeck.push_back(make_unique<Creature>(*creature));
+    }
+    
+    // * Fair Hand Mechanic: Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
     // Collect indices of all creatures matching the criteria
     vector<size_t> matchingIndices;
-    for (size_t i = 0; i < tempMainDeck.size(); ++i) {
+    
+    for (size_t i = 0; i < tempMainDeck.size(); i++) {
         Creature* creature = tempMainDeck[i].get();
         if (creature->isCostTypeBlood() && creature->getCost() < 2) {
             matchingIndices.push_back(i);
@@ -48,45 +109,5 @@ void fairHandMechanic(vector<unique_ptr<Creature>>& mainDeck) {
         // Remove it from tempMainDeck
         tempMainDeck.erase(tempMainDeck.begin() + randomIndex);
     }
-
-    // Output results
-    cout << "Current Hand:" << endl;
-    for (const auto& creature : currentHand) {
-        creature->displayStats();
-    }
-
-    cout << "Remaining Temp Main Deck:" << endl;
-    for (const auto& creature : tempMainDeck) {
-        creature->displayStats();
-    }
-}
-
-
-int main() {
-    // Decks of creatures
-
-    // Adding creatures to the deck
-    mainDeck.push_back(make_unique<Bullfrog>());
-    mainDeck.push_back(make_unique<Stoat>());
-    mainDeck.push_back(make_unique<Wolf>());
-    mainDeck.push_back(make_unique<Wolf>());
-
-    // // Display stats of all creatures in the deck
-    // for (const auto& creature : mainDeck) {
-    //     creature->displayStats();
-    // }
-
-    // int index = 2; // Example: Access the third creature (index 2)
-    // if (index >= 0 && index < mainDeck.size()) {
-    //     cout << "Displaying stats for creature at index " << index << ":" << endl;
-    //     mainDeck[index]->displayStats();
-    // } else {
-    //     cout << "Invalid index!" << endl;
-    // }
-
-    fairHandMechanic(mainDeck);
-    fairHandMechanic(mainDeck);
-
-    return 0;
 }
 
