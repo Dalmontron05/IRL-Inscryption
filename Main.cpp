@@ -42,7 +42,7 @@ int main() {
     for (int i = 0; i < 10; i++)
     {
         sideDeck.push_back(make_unique<Squirrel>());
-        tempSideDeck.push_back(make_unique<Squirrel>());
+        // tempSideDeck.push_back(make_unique<Squirrel>());
     }
 
     // while (willReplay == true)
@@ -88,7 +88,13 @@ int main() {
         }
 
         printDeck(mainDeck, "Main Deck");
+        cout << endl;
+        printDeck(sideDeck, "Side Deck");
+        cout << endl;
         printDeck(tempMainDeck, "Temp Main Deck");
+        cout << endl;
+        printDeck(tempSideDeck, "Temp Side Deck");
+        cout << endl;
         printDeck(currentHand, "Current Hand");
     // }
     
@@ -116,6 +122,10 @@ unique_ptr<Creature> moveRandomCreature(vector<unique_ptr<Creature>>& fromDeck, 
 
     // Move the selected creature to `toDeck`
     unique_ptr<Creature> movedCreature = move(fromDeck[randomIndex]);
+    if (!movedCreature) {
+        cerr << "Error: Moved creature is null!" << endl;
+        return nullptr;
+    }
     toDeck.push_back(move(movedCreature));
 
     // Remove the creature from `fromDeck`
@@ -152,11 +162,10 @@ void fightSetup()
     }
 
     // draw a squirel from side deck
-    if (tempSideDeck.empty()) {
-        cerr << "Error: tempSideDeck is empty!" << endl;
-        return;
+    auto movedSquirrel = moveRandomCreature(tempSideDeck, currentHand);
+    if (!movedSquirrel) {
+        cerr << "Error: Failed to move squirrel to currentHand!" << endl;
     }
-    moveRandomCreature(tempSideDeck, currentHand);
     
     // * Fair Hand Mechanic: Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
     // Collect indices of all creatures matching the criteria
@@ -179,7 +188,12 @@ void fightSetup()
         size_t randomIndex = matchingIndices[rand() % matchingIndices.size()];
 
         // Move the chosen creature to currentHand
-        currentHand.push_back(move(tempMainDeck[randomIndex]));
+        unique_ptr<Creature> chosenCreature = move(tempMainDeck[randomIndex]);
+        if (!chosenCreature) {
+            cerr << "Error: Chosen creature is null!" << endl;
+        } else {
+            currentHand.push_back(move(chosenCreature));
+        }
 
         // Remove it from tempMainDeck
         tempMainDeck.erase(tempMainDeck.begin() + randomIndex);
