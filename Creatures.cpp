@@ -4,11 +4,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
 
-// Classes
+// Base Class
 class Creature
 {
 protected:
@@ -27,45 +28,51 @@ protected:
 
 public:
     // Constructor
+public:
     Creature(string name, bool canBeGained, bool costTypeIsBlood, int cost, int attack, int health, vector<string> tribe, vector<string> sigils)
-        : name(name), costTypeIsBlood(costTypeIsBlood), cost(cost), attack(attack), health(health), tribe(tribe), sigils(sigils) {}
+        : name(name), canBeGained(canBeGained), costTypeIsBlood(costTypeIsBlood), cost(cost), attack(attack), health(health), tribe(tribe), sigils(sigils) {}
 
+    // Virtual destructor for proper cleanup
+    virtual ~Creature() {} 
+
+    // getters and setters
+    bool isCostTypeBlood() const {
+        return costTypeIsBlood;
+    }
+
+    int getCost() const {
+        return cost;
+    }
 
     // Functions
-    void hiThere()
-    {
-        cout << "My name is : " << name << endl;
+    virtual void displayStats() const {
+        cout << "Name: " << name << ", Attack: " << attack << ", Health: " << health << endl;
     }
 };
 
 
-// Side Deck
-class Squirrel : public Creature
-{
+// Derived Classes
+class Squirrel : public Creature {
 public:
     Squirrel()
-    : Creature("Squirrel", false, true, 0, 0, 1, {"Squirrel"}, {"None"}) {}
+        : Creature("Squirrel", false, true, 0, 0, 1, {"Squirrel"}, {"None"}) {}
 };
 
-
-// Main Deck
-class Bullfrog : public Creature
-{
+class Bullfrog : public Creature {
+public:
     Bullfrog()
-    : Creature("Bullfrog", true, true, 1, 1, 2, {"Reptile"}, {"Mighty Leap"}) {}
+        : Creature("Bullfrog", true, true, 1, 1, 2, {"Reptile"}, {"Mighty Leap"}) {}
 };
 
-
-class Stoat : public Creature
-{
+class Stoat : public Creature {
 public:
     Stoat()
-    : Creature("Stoat", true, true, 1, 1, 3, {"None"}, {"None"}) {}
+        : Creature("Stoat", true, true, 1, 1, 3, {"None"}, {"None"}) {}
 };
 
-class Wolf : public Creature
-{
+class Wolf : public Creature {
+public:
     Wolf()
-    : Creature("Wolf", true, true, 2, 3, 2, {"Canine"}, {"None"}) {}
+        : Creature("Wolf", true, true, 2, 3, 2, {"Canine"}, {"None"}) {}
 };
 
