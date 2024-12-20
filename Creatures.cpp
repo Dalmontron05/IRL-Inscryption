@@ -35,13 +35,70 @@ public:
     // Virtual destructor for proper cleanup
     virtual ~Creature() {} 
 
-    // getters and setters
-    bool isCostTypeBlood() const {
+    // Getters
+    string getName() const {
+        return name;
+    }
+
+    bool getCanBeGained() const {
+        return canBeGained;
+    }
+
+    bool getCostTypeIsBlood() const {
         return costTypeIsBlood;
     }
 
     int getCost() const {
         return cost;
+    }
+
+    int getAttack() const {
+        return attack;
+    }
+
+    int getHealth() const {
+        return health;
+    }
+
+    vector<string> getTribe() const {
+        return tribe;
+    }
+
+    vector<string> getSigils() const {
+        return sigils;
+    }
+
+    // Setters
+    void setName(const string& newName) {
+        name = newName;
+    }
+
+    void setCanBeGained(bool newCanBeGained) {
+        canBeGained = newCanBeGained;
+    }
+
+    void setCostTypeIsBlood(bool newCostTypeIsBlood) {
+        costTypeIsBlood = newCostTypeIsBlood;
+    }
+
+    void setCost(int newCost) {
+        cost = newCost;
+    }
+
+    void setAttack(int newAttack) {
+        attack = newAttack;
+    }
+
+    void setHealth(int newHealth) {
+        health = newHealth;
+    }
+
+    void setTribe(const vector<string>& newTribe) {
+        tribe = newTribe;
+    }
+
+    void setSigils(const vector<string>& newSigils) {
+        sigils = newSigils;
     }
 
     // Functions

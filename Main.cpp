@@ -111,7 +111,7 @@ void fightSetup()
     
     for (size_t i = 0; i < tempMainDeck.size(); i++) {
         Creature* creature = tempMainDeck[i].get();
-        if (creature->isCostTypeBlood() && creature->getCost() < 2) {
+        if (creature->getCostTypeIsBlood() && creature->getCost() < 2) {
             matchingIndices.push_back(i);
         }
     }
