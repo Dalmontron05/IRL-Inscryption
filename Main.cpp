@@ -9,8 +9,8 @@
 #include <ctime>    // For seeding rand()
 
 #include "main.h"
-#include "Escape-Codes.cpp"
-#include "Creatures.cpp"
+// #include "Escape-Codes.cpp"
+// #include "Creatures.cpp"
 
 using namespace std;
 
@@ -22,7 +22,7 @@ vector<unique_ptr<Creature>> mainDeck;
 vector<unique_ptr<Creature>> sideDeck;
 // we have temporary decks to keep track of which cards have been drawn in a fight.
 vector<unique_ptr<Creature>> tempMainDeck;
-vector<unique_ptr<Creature>> tempsideDeck;
+vector<unique_ptr<Creature>> tempSideDeck;
 // for now, current hand creatures are also considered on the board
 vector<unique_ptr<Creature>> currentHand;
 
@@ -42,15 +42,15 @@ int main() {
     for (int i = 0; i < 10; i++)
     {
         sideDeck.push_back(make_unique<Squirrel>());
-        tempsideDeck.push_back(make_unique<Squirrel>());
+        tempSideDeck.push_back(make_unique<Squirrel>());
     }
 
-    while (willReplay == true)
-    {
+    // while (willReplay == true)
+    // {
         // Gives user the list of options available in the application
-        cout << "What will you do (Enter integer)?" << endl;
-        cout << "1) Draw First Card 2) Draw Card" << endl;
-        cout << "3) Discard Card 4) Reset 5) Exit" << endl;
+        cout << "What will you do (Enter integer)?" << endl << endl;
+        cout << "1) Draw First Card 2) Draw From Main Deck 3) Draw From Side Deck" << endl;
+        cout << "\t\t4) Discard Card 5) Reset 6) Exit" << endl;
 
         // Asks user for choice input
         int userChoice;
@@ -63,20 +63,22 @@ int main() {
         switch (userChoice)
         {
             case 1:
-                cout << "Starting fight sequence, drawing first 5 cards...";
+                cout << "Starting fight sequence, drawing first 5 cards..." << endl;
                 fightSetup();
-
                 break;
             case 2:
-                // code
+                cout << "Drawing card from main deck..." << endl;
                 break;
             case 3:
-                // code
+                cout << "Drawing card from side deck..." << endl;
                 break;
             case 4:
-                // code
+                cout << "Which card should be discarded?" << endl;
                 break;
             case 5:
+                cout << "Stopping fight sequence" << endl;
+                break;
+            case 6:
                 cout << "Exiting..." << endl;
                 willReplay = false;
                 break;
@@ -84,26 +86,77 @@ int main() {
                 cerr << "Invalid input detected. Exiting..." << endl;
                 willReplay = false;
         }
-    }
+
+        printDeck(mainDeck, "Main Deck");
+        printDeck(tempMainDeck, "Temp Main Deck");
+        printDeck(currentHand, "Current Hand");
+    // }
     
     return 0;
+}
+
+
+// Function to randomly move a creature between two decks
+unique_ptr<Creature> moveRandomCreature(vector<unique_ptr<Creature>>& fromDeck, vector<unique_ptr<Creature>>& toDeck) {
+    // Ensure the `fromDeck` is not empty
+    if (fromDeck.empty()) {
+        cout << "No creatures available in the source deck!" << endl;
+        return nullptr; // Return null if no creatures are available to move
+    }
+
+    // Seed the random number generator
+    srand(static_cast<unsigned>(time(0)));
+
+    // Randomly select an index from the `fromDeck`
+    size_t randomIndex = rand() % fromDeck.size();
+    if (!fromDeck[randomIndex]) {
+        cerr << "Error: Null creature at random index in fromDeck!" << endl;
+        return nullptr;
+    }
+
+    // Move the selected creature to `toDeck`
+    unique_ptr<Creature> movedCreature = move(fromDeck[randomIndex]);
+    toDeck.push_back(move(movedCreature));
+
+    // Remove the creature from `fromDeck`
+    fromDeck.erase(fromDeck.begin() + randomIndex);
+
+    // Return the moved creature
+    return move(toDeck.back());
 }
 
 
 // Sets up initial prerequisites needed before a fight happens
 void fightSetup()
 {
-    // initalize temp decks as regular decks
-    // tempMainDeck = mainDeck;
-    // tempsideDeck = sideDeck;
+    // Clear temp decks to ensure they're empty
+    tempMainDeck.clear();
+    tempSideDeck.clear();
 
+    // Duplicate mainDeck into tempMainDeck
     for (const auto& creature : mainDeck) {
-        tempMainDeck.push_back(make_unique<Creature>(*creature));
+        if (!creature) {
+            cerr << "Error: Null creature in mainDeck!" << endl;
+            continue;
+        }
+        tempMainDeck.push_back(creature -> clone());  // Use clone for deep copy
     }
 
+    // Duplicate sideDeck into tempSideDeck
     for (const auto& creature : sideDeck) {
-        tempsideDeck.push_back(make_unique<Creature>(*creature));
+        if (!creature) {
+            cerr << "Error: Null creature in sideDeck!" << endl;
+            continue;
+        }
+        tempSideDeck.push_back(creature -> clone());
     }
+
+    // draw a squirel from side deck
+    if (tempSideDeck.empty()) {
+        cerr << "Error: tempSideDeck is empty!" << endl;
+        return;
+    }
+    moveRandomCreature(tempSideDeck, currentHand);
     
     // * Fair Hand Mechanic: Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
     // Collect indices of all creatures matching the criteria
@@ -111,7 +164,11 @@ void fightSetup()
     
     for (size_t i = 0; i < tempMainDeck.size(); i++) {
         Creature* creature = tempMainDeck[i].get();
-        if (creature->getCostTypeIsBlood() && creature->getCost() < 2) {
+        if (!creature) {
+            cerr << "Error: Null creature in tempMainDeck!" << endl;
+            continue;
+        }
+        if (creature -> getCostTypeIsBlood() && creature -> getCost() < 2) {
             matchingIndices.push_back(i);
         }
     }
@@ -126,33 +183,48 @@ void fightSetup()
 
         // Remove it from tempMainDeck
         tempMainDeck.erase(tempMainDeck.begin() + randomIndex);
+    } else {
+        cerr << "Error: No creatures match the criteria!" << endl;
     }
 }
 
 void test()
 {
     // TEST: Display stats of all creatures in the deck
-    cout << "main deck";
-    for (const auto& creature : mainDeck) {
-        creature->displayStats();
-    }
+    // cout << "main deck" << endl;
+    // for (const auto& creature : mainDeck) {
+    //     creature -> displayStats();
+    // }
 
-    cout << endl;
-    cout << endl;
+    // cout << endl;
+    // cout << endl;
 
     // Display stats of all creatures in the temp deck
-    cout << "temp main deck";
+    cout << "temp main deck" << endl;
     for (const auto& creature : tempMainDeck) {
-        creature->displayStats();
+        creature -> displayStats();
     }
 
     cout << endl;
     cout << endl;
 
-    // current hand
-    cout << "current hand";
+    // Display stats of all creatures in current hand
+    cout << "current hand" << endl;
     for (const auto& creature : currentHand) {
-    creature->displayStats();
+        creature -> displayStats();
     }
+}
+
+void printDeck(const vector<unique_ptr<Creature>>& deck, const string& deckName) {
+    cout << "Deck: " << deckName << " (Size: " << deck.size() << ")" << endl;
+    for (size_t i = 0; i < deck.size(); i++) {
+        if (deck[i]) {
+            cout << "[" << i << "] ";
+            deck[i]->displayStats();
+        } else {
+            cout << "[" << i << "] Null Creature!" << endl;
+        }
+    }
+    cout << endl;
 }
 

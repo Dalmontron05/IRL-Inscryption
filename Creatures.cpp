@@ -32,8 +32,10 @@ public:
     Creature(string name, bool canBeGained, bool costTypeIsBlood, int cost, int attack, int health, vector<string> tribe, vector<string> sigils)
         : name(name), canBeGained(canBeGained), costTypeIsBlood(costTypeIsBlood), cost(cost), attack(attack), health(health), tribe(tribe), sigils(sigils) {}
 
-    // Virtual destructor for proper cleanup
     virtual ~Creature() {} 
+
+    // Virtual clone method for polymorphic duplication
+    virtual unique_ptr<Creature> clone() const = 0;
 
     // Getters
     string getName() const {
@@ -113,23 +115,40 @@ class Squirrel : public Creature {
 public:
     Squirrel()
         : Creature("Squirrel", false, true, 0, 0, 1, {"Squirrel"}, {"None"}) {}
+    
+    // allows for class to return itself instead of base creature class
+    unique_ptr<Creature> clone() const override {
+        return make_unique<Squirrel>(*this);
+    }
 };
 
 class Bullfrog : public Creature {
 public:
     Bullfrog()
         : Creature("Bullfrog", true, true, 1, 1, 2, {"Reptile"}, {"Mighty Leap"}) {}
+
+    unique_ptr<Creature> clone() const override {
+        return make_unique<Bullfrog>(*this);
+    }
 };
 
 class Stoat : public Creature {
 public:
     Stoat()
         : Creature("Stoat", true, true, 1, 1, 3, {"None"}, {"None"}) {}
+    
+    unique_ptr<Creature> clone() const override {
+        return make_unique<Stoat>(*this);
+    }
 };
 
 class Wolf : public Creature {
 public:
     Wolf()
         : Creature("Wolf", true, true, 2, 3, 2, {"Canine"}, {"None"}) {}
+
+    unique_ptr<Creature> clone() const override {
+        return make_unique<Wolf>(*this);
+    }
 };
 
