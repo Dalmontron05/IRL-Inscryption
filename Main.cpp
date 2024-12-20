@@ -14,7 +14,7 @@
 
 using namespace std;
 
-// TODO: eventually make it to where a deck isn't simplified to just "creatures," and that they are unique subclasses (since bell tentale and dire wolf are going to need their own implimentations for the attack and 1 turn grow up sigils respectively)
+// ! the squirrel that is added is null
 
 // * Variables
 bool willReplay = true;
@@ -49,8 +49,8 @@ int main() {
     // {
         // Gives user the list of options available in the application
         cout << "What will you do (Enter integer)?" << endl << endl;
-        cout << "1) Draw First Card 2) Draw From Main Deck 3) Draw From Side Deck" << endl;
-        cout << "\t\t4) Discard Card 5) Reset 6) Exit" << endl;
+        cout << "1) Draw First Card (also resets temp decks) 2) Draw From Main Deck" << endl;
+        cout << "\t\t 3) Draw From Side Deck 4) Discard Card 5) Exit" << endl;
 
         // Asks user for choice input
         int userChoice;
@@ -68,17 +68,16 @@ int main() {
                 break;
             case 2:
                 cout << "Drawing card from main deck..." << endl;
+                moveRandomCreature(tempMainDeck, currentHand);
                 break;
             case 3:
                 cout << "Drawing card from side deck..." << endl;
+                moveRandomCreature(tempSideDeck, currentHand);
                 break;
             case 4:
                 cout << "Which card should be discarded?" << endl;
                 break;
             case 5:
-                cout << "Stopping fight sequence" << endl;
-                break;
-            case 6:
                 cout << "Exiting..." << endl;
                 willReplay = false;
                 break;
@@ -127,6 +126,9 @@ unique_ptr<Creature> moveRandomCreature(vector<unique_ptr<Creature>>& fromDeck, 
         return nullptr;
     }
     toDeck.push_back(move(movedCreature));
+    if (!toDeck.back()) {
+        cerr << "Error: Null creature added to toDeck!" << endl;
+    }
 
     // Remove the creature from `fromDeck`
     fromDeck.erase(fromDeck.begin() + randomIndex);
@@ -162,10 +164,15 @@ void fightSetup()
     }
 
     // draw a squirel from side deck
+    // ! the squirrel that is added is null
+    // printDeck(tempSideDeck, "Temp Side Deck Before moveRandomCreature");
+    // printDeck(currentHand, "Current Hand before moveRandomCreature");
     auto movedSquirrel = moveRandomCreature(tempSideDeck, currentHand);
     if (!movedSquirrel) {
         cerr << "Error: Failed to move squirrel to currentHand!" << endl;
     }
+    // printDeck(tempSideDeck, "Temp Side Deck After moveRandomCreature");
+    // printDeck(currentHand, "Current Hand after moveRandomCreature");
     
     // * Fair Hand Mechanic: Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
     // Collect indices of all creatures matching the criteria
@@ -236,7 +243,7 @@ void printDeck(const vector<unique_ptr<Creature>>& deck, const string& deckName)
             cout << "[" << i << "] ";
             deck[i]->displayStats();
         } else {
-            cout << "[" << i << "] Null Creature!" << endl;
+            cout << "[" << i << "] Null Creature Detected!" << endl;
         }
     }
     cout << endl;
