@@ -101,8 +101,12 @@ int main() {
 }
 
 
+// adds sigils to a creature
+// WHY: setSigils for creatures just sets it equal to a vector, we need to append sigils to the end of the vector
+
+
 // Function to randomly move a creature between two decks
-unique_ptr<Creature> moveRandomCreature(vector<unique_ptr<Creature>>& fromDeck, vector<unique_ptr<Creature>>& toDeck) {
+unique_ptr<Creature> moveRandomCreature(vector<unique_ptr<Creature>>& fromDeck, vector<unique_ptr<Creature>>& toDeck) {   
     // Ensure the `fromDeck` is not empty
     if (fromDeck.empty()) {
         cout << "No creatures available in the source deck!" << endl;
