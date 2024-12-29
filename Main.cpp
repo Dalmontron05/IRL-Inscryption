@@ -167,16 +167,24 @@ void fightSetup()
         tempSideDeck.push_back(creature -> clone());
     }
 
-    // draw a squirel from side deck
-    // ! the squirrel that is added is null
-    // printDeck(tempSideDeck, "Temp Side Deck Before moveRandomCreature");
-    // printDeck(currentHand, "Current Hand before moveRandomCreature");
-    auto movedSquirrel = moveRandomCreature(tempSideDeck, currentHand);
-    if (!movedSquirrel) {
-        cerr << "Error: Failed to move squirrel to currentHand!" << endl;
+    // * Draws a squirel from side deck
+    // checks if any creatures in tempSideDeck are null
+    for (size_t i = 0; i < tempSideDeck.size(); i++) 
+    {
+        Creature* creature = tempSideDeck[i].get();
+        if (!creature)
+        {
+            cerr << "Error: Null creature in tempSideDeck!" << endl;
+            continue;
+        }
     }
-    // printDeck(tempSideDeck, "Temp Side Deck After moveRandomCreature");
-    // printDeck(currentHand, "Current Hand after moveRandomCreature");
+
+    // copies a squirrel from tempSideDeck to currentHand
+    currentHand.push_back(move(tempSideDeck[0]));
+
+    // Removes it from tempSideDeck
+    tempSideDeck.erase(tempSideDeck.begin() + 0);
+
     
     // * Fair Hand Mechanic: Randomly draws one free/one blood cost card from tempMainDeck to current hand, then removes that creature from tempMainDeck.
     // Collect indices of all creatures matching the criteria
@@ -196,18 +204,24 @@ void fightSetup()
     // Randomly pick one creature from matchingIndices
     if (!matchingIndices.empty()) {
         srand(static_cast<unsigned>(time(0))); // Seed random number generator
-        size_t randomIndex = matchingIndices[rand() % matchingIndices.size()];
+        size_t randomIndex = rand() % matchingIndices.size();
+        size_t creatureIndex = matchingIndices[randomIndex];
 
-        // Move the chosen creature to currentHand
-        unique_ptr<Creature> chosenCreature = move(tempMainDeck[randomIndex]);
-        if (!chosenCreature) {
-            cerr << "Error: Chosen creature is null!" << endl;
+        // Ensure the creatureIndex is within bounds
+        if (creatureIndex >= tempMainDeck.size()) {
+            cerr << "Error: Creature index out of bounds!" << endl;
         } else {
-            currentHand.push_back(move(chosenCreature));
-        }
+            // Move the chosen creature to currentHand
+            unique_ptr<Creature> chosenCreature = move(tempMainDeck[creatureIndex]);
+            if (!chosenCreature) {
+                cerr << "Error: Chosen creature is null!" << endl;
+            } else {
+                currentHand.push_back(move(chosenCreature));
+            }
 
-        // Remove it from tempMainDeck
-        tempMainDeck.erase(tempMainDeck.begin() + randomIndex);
+            // Remove it from tempMainDeck
+            tempMainDeck.erase(tempMainDeck.begin() + creatureIndex);
+        }
     } else {
         cerr << "Error: No creatures match the criteria!" << endl;
     }
@@ -252,4 +266,3 @@ void printDeck(const vector<unique_ptr<Creature>>& deck, const string& deckName)
     }
     cout << endl;
 }
-
